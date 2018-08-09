@@ -1,4 +1,7 @@
 # coding: utf-8
+from builtins import object
+
+
 try:
     import requests
     import json

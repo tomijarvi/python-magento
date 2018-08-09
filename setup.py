@@ -24,6 +24,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'future',
         'suds-jurko>=0.6',
     ],
     classifiers=[

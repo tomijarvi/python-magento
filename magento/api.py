@@ -6,15 +6,16 @@
 
     :license: BSD, see LICENSE for more details
 '''
-import sys
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from future.utils import with_metaclass
 from threading import RLock
+
 
 PROTOCOLS = []
 try:
-    if sys.version_info < (3, 0):
-        from xmlrpclib import ServerProxy
-    else:
-        from xmlrpc.client import ServerProxy
+    from xmlrpc.client import ServerProxy
 except ImportError:
     pass
 else:
@@ -57,11 +58,10 @@ class ClientApiMeta(type):
         return Klass
 
 
-class API(object):
+class API(with_metaclass(ClientApiMeta, object)):
     """
     Generic API to connect to magento
     """
-    __metaclass__ = ClientApiMeta
     __abstract__ = True
 
     def __init__(self, url, username, password,
@@ -136,7 +136,10 @@ class API(object):
         """
         assert protocol \
             in PROTOCOLS, "protocol must be %s" % ' OR '.join(PROTOCOLS)
-        self.url = str(full_url and url or expand_url(url, protocol))
+        if full_url:
+            self.url = url
+        else:
+            self.url = expand_url(url, protocol)
         self.username = username
         self.password = password
         self.protocol = protocol
